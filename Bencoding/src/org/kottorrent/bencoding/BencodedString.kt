@@ -1,16 +1,13 @@
 package org.kottorrent.bencoding
 
-import kotlin.text.StringBuilder
-
-class BencodedString constructor(wrappedString: String) : BencodedElement() {
-    private val input = wrappedString
+internal data class BencodedString(val wrappedString: String) : BencodedElement() {
 
     override fun encode(): String {
         val sb = StringBuilder()
 
-        sb.append(input.length.toString())
+        sb.append(wrappedString.length.toString())
         sb.append(':')
-        sb.append(input)
+        sb.append(wrappedString)
 
         return sb.toString()
     }
