@@ -2,8 +2,6 @@ package org.kottorrent.bencoding.tests
 
 import org.junit.jupiter.api.Test
 import org.kottorrent.bencoding.BencodedDictionary
-import org.kottorrent.bencoding.BencodedList
-import org.kottorrent.bencoding.BencodedString
 import kotlin.test.assertEquals
 
 internal class BencodedDictionaryTest {
@@ -19,8 +17,8 @@ internal class BencodedDictionaryTest {
     fun `small dictionary encoded correctly`() {
         val bencDict = BencodedDictionary(
             mapOf(
-                Pair(BencodedString("cow"), BencodedString("moo")),
-                Pair(BencodedString("spam"), BencodedString("eggs"))
+                Pair("cow", "moo"),
+                Pair("spam", "eggs")
             )
         )
 
@@ -29,19 +27,20 @@ internal class BencodedDictionaryTest {
 
     @Test
     fun `dictionary with list encoded correctly`() {
+        val bencDict = BencodedDictionary(mapOf(Pair("spam", listOf("a", "b"))))
+
+        assertEquals("d4:spaml1:a1:bee", bencDict.encode())
+    }
+
+    @Test
+    fun `dictionary entries sorted correctly`() {
         val bencDict = BencodedDictionary(
             mapOf(
-                Pair(
-                    BencodedString("spam"), BencodedList(
-                        listOf(
-                            BencodedString("a"),
-                            BencodedString("b")
-                        )
-                    )
-                )
+                Pair("bbb", "moo"),
+                Pair("aaa", "eggs")
             )
         )
 
-        assertEquals("d4:spaml1:a1:bee", bencDict.encode())
+        assertEquals("d3:aaa4:eggs3:bbb3:mooe", bencDict.encode())
     }
 }

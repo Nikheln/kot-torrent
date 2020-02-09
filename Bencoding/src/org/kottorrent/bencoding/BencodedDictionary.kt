@@ -1,6 +1,6 @@
 package org.kottorrent.bencoding
 
-internal data class BencodedDictionary(val wrappedDictionary: Map<BencodedString, BencodedElement>) :
+internal data class BencodedDictionary(val wrappedDictionary: Map<String, Any>) :
     BencodedElement() {
 
     override fun encode(): String {
@@ -8,10 +8,10 @@ internal data class BencodedDictionary(val wrappedDictionary: Map<BencodedString
 
         sb.append('d')
         wrappedDictionary
-            .toSortedMap(Comparator { t, t2 -> t.wrappedString.compareTo(t2.wrappedString) })
+            .toSortedMap()
             .forEach {
-                sb.append(it.key.encode())
-                sb.append(it.value.encode())
+                sb.append(BencodedString(it.key).encode())
+                sb.append(create(it.value).encode())
             }
         sb.append('e')
 
