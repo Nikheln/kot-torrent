@@ -5,13 +5,14 @@ internal data class BencodedDictionary(val wrappedDictionary: Map<String, Any>) 
 
     override fun encode(): String {
         val sb = StringBuilder()
+        val encoder = BencodingEncoder()
 
         sb.append('d')
         wrappedDictionary
             .toSortedMap()
             .forEach {
-                sb.append(BencodedString(it.key).encode())
-                sb.append(create(it.value).encode())
+                sb.append(encoder.encode(it.key))
+                sb.append(encoder.encode(it.value))
             }
         sb.append('e')
 
