@@ -129,10 +129,12 @@ class BencodingEncoder {
             var previousKey: String? = null
 
             while (currentIndex < currentInput.length && currentInput[currentIndex] != 'e') {
-                val nextKey = decodeNextElement() as? String
-                    ?: throw IllegalArgumentException(
-                        "Invalid input format, a dictionary can only have strings as keys"
+                val nextKey = decodeNextElement()
+                if (nextKey !is String) {
+                    throw IllegalArgumentException(
+                        "Invalid input format, a dictionary can only have strings as keys, got $nextKey, a ${nextKey.javaClass.kotlin.qualifiedName} instead"
                     )
+                }
 
                 // According to Bencoding specification, dictionary keys must be ordered
                 if (previousKey != null && previousKey > nextKey) throw IllegalArgumentException(
