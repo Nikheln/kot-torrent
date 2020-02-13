@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Bencoding/Bencoding.iml" filepath="$PROJECT_DIR$/Bencoding/Bencoding.iml" />
+      <module fileurl="file://$PROJECT_DIR$/KotTorrentLibrary/KotTorrentLibrary.iml" filepath="$PROJECT_DIR$/KotTorrentLibrary/KotTorrentLibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/kot-torrent.iml" filepath="$PROJECT_DIR$/kot-torrent.iml" />
     </modules>
   </component>
