@@ -2,23 +2,23 @@ package org.kottorrent.library
 
 import org.kottorrent.bencoding.BencodingEncoder
 
-class TorrentFileParser() {
+class TorrentFileParser {
 
-    private fun ParseTorrentFileContents(input: String): Torrent {
+    internal fun parseTorrentFileContents(input: String): Torrent {
         val decoder = BencodingEncoder()
-        val baseDictionary = decoder.decode(input) as? Map<String, Any>
+        val baseDictionary = decoder.decode(input) as? Map<*, *>
             ?: throw IllegalArgumentException("Provided torrent file was not in the correct format")
-        val announceUrl = baseDictionary.get("announce") as? String
+        val announceUrl = baseDictionary["announce"] as? String
             ?: throw IllegalArgumentException("No announce URL found")
 
-        val infoDictBase = baseDictionary.get("info") as? Map<String, Any>
+        val infoDictBase = baseDictionary["info"] as? Map<*, *>
             ?: throw IllegalArgumentException("No info dictionary found")
-        val infoDict = ConstructInfoDictionary(infoDictBase);
+        val infoDict = constructInfoDictionary(infoDictBase)
 
         return Torrent(infoDict, announceUrl)
     }
 
-    private fun ConstructInfoDictionary(baseMap: Map<String, Any>): InfoDictionary {
+    private fun constructInfoDictionary(baseMap: Map<*, *>): InfoDictionary {
         val isSingleFileInfoDictionary = baseMap.containsKey("length")
 
         val pieceLength = baseMap["piece length"] as? Long
@@ -36,18 +36,19 @@ class TorrentFileParser() {
         } else {
             val dirName = baseMap["name"] as? String
                 ?: throw IllegalArgumentException("Mandatory name property not found from info dictionary")
-            val files = baseMap["files"] as? List<Map<String, Any>>
+            val files = baseMap["files"] as? List<*>
                 ?: throw IllegalArgumentException("Mandatory file list was not found")
 
-            val fileInfos = files.map {
+            val fileInfos = files
+                .filterIsInstance<Map<String, Any>>()
+                .map {
+                    val fileLength = it["length"] as? Long
+                        ?: throw IllegalArgumentException("A file entry without length was found")
+                    val filePath = it["path"] as? List<*>
+                        ?: throw IllegalArgumentException("A file entry without path was found")
 
-                val fileLength = it["length"] as? Long
-                    ?: throw IllegalArgumentException("A file entry without length was found")
-                val filePath = it["path"] as? List<String>
-                    ?: throw IllegalArgumentException("A file entry without path was found")
-
-                Pair(fileLength, filePath)
-            }
+                    Pair(fileLength, filePath.filterIsInstance<String>())
+                }
 
             return MultiFileInfoDictionary(pieceLength, pieces, dirName, fileInfos)
         }
