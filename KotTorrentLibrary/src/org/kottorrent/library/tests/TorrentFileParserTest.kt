@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test
 import org.kottorrent.library.SingleFileInfoDictionary
 import org.kottorrent.library.TorrentFileParser
 import java.net.URL
-import java.nio.ByteBuffer
-import java.nio.channels.Channels
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -15,7 +13,7 @@ internal class TorrentFileParserTest {
     fun `valid torrent file parsed correctly`() {
         val sourceUri = """http://releases.ubuntu.com/19.10/ubuntu-19.10-desktop-amd64.iso.torrent"""
 
-        val torrentString = getTorrentString(sourceUri)
+        val torrentString = URL(sourceUri).readText(Charsets.US_ASCII)
         assertNotNull(torrentString, "Expected torrent contents to be non-null")
         val torrentPojo = TorrentFileParser().parseTorrentFileContents(torrentString)
 
@@ -25,27 +23,5 @@ internal class TorrentFileParserTest {
         } else {
             assert(false)
         }
-    }
-
-    private fun getTorrentString(sourceUri: String): String? {
-        val stream = URL(sourceUri).openStream()
-        val channel = Channels.newChannel(stream)
-        val buffer = ByteBuffer.allocate(1024)
-
-        val sb = StringBuilder()
-        var readBytes = channel.read(buffer)
-
-        while (readBytes > 0) {
-            val line = String(buffer.array().sliceArray(0 until readBytes), Charsets.US_ASCII)
-            sb.append(line)
-
-            buffer.clear()
-            readBytes = channel.read(buffer)
-        }
-
-        channel.close()
-        stream.close()
-
-        return sb.toString()
     }
 }
